@@ -1,20 +1,10 @@
 # encoding: utf-8
 
+require 'timespan'
+
 module IngraphRB
   # interface to fetch performance data
   class PerformanceData
-    def self.sql_for_time_limit(limit)
-      return '' unless limit
-
-      case limit
-      when String
-        " AND to_timestamp(timestamp) > now() - interval '#{limit}' "
-      when Array
-        " AND to_timestamp(timestamp) >= now() - interval '#{limit[0]}'" +
-          " AND to_timestamp(timestamp) < now() - interval '#{limit[1]}' "
-      end
-    end
-
     attr_reader :plot_ids, :host_name, :service_name
 
     def initialize(db, hosts, service_name, opts = {})
@@ -22,7 +12,7 @@ module IngraphRB
       @hosts = normalize_hosts(hosts)
       @service_name = service_name
       @timezone = opts[:timezone]
-      @limit = opts[:limit]
+      @timespan = opts[:timespan]
       @offset = opts[:offset] || 0
       @timeframe = opts[:timeframe] || Timeframe.smallest
       @x = opts[:x_key] || :x
@@ -30,8 +20,8 @@ module IngraphRB
       find_plot_ids
     end
 
-    def limit_to(span)
-      @limit = span
+    def with_timespan(timespan)
+      @timespan = normalize_timespan(timespan)
       self
     end
 
@@ -46,7 +36,7 @@ module IngraphRB
       sql << "SELECT plot_id, (timestamp + #{@offset}) as time, "
       sql << 'timestamp, min as value '
       sql << "FROM datapoint WHERE plot_id in ? "
-      sql << self.class.sql_for_time_limit(@limit)
+      sql << sql_for_timespan
       sql << "AND timeframe_id = #{@timeframe.id} "
       sql << ' ORDER BY timestamp ASC'
       sql
@@ -60,6 +50,21 @@ module IngraphRB
     end
 
     private
+
+    def normalize_timespan(timespan_in)
+      if timespan_in.is_a? Array
+        Timespan.new(0).from(timespan_in[0]).until(timespan_in[1])
+      else
+        Timespan.new(timespan_in)
+      end
+    end
+
+    def sql_for_timespan
+      return '' unless @timespan.is_a? Timespan
+
+      "AND timestamp >= #{@timespan.start_time.to_i} AND " +
+        "timestamp < #{@timespan.end_time.to_i} "
+    end
 
     def normalize_hosts(hosts)
       if hosts.is_a? Array

@@ -13,7 +13,9 @@ Gem::Specification.new do |gem|
   gem.summary     = %q{Ingraph Ruby gem}
   gem.description = %q{Ruby gem for accessing Ingraph (Icinga) performance data}
 
+  gem.add_dependency 'pg'
   gem.add_dependency 'sequel'
+  gem.add_dependency 'timespan'
 
   gem.files         = `git ls-files`.split("\n")
   gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
