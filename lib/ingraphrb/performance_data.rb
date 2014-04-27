@@ -64,7 +64,7 @@ module IngraphRB
       sql
     end
 
-    def to_timeseries
+    def fetch
       @db.fetch(sql).all
     end
   end
