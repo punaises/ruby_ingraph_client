@@ -3,19 +3,6 @@
 module IngraphRB
   # interface to fetch performance data
   class PerformanceData
-    def self.plot_id(db, host_name, service_name)
-      sql = <<-SQL
-        select plot.id as id from plot
-        inner join hostservice on plot.hostservice_id = hostservice.id
-        inner join host on hostservice.host_id = host.id
-        inner join service on hostservice.service_id = service.id
-        where host.name = ? and service.name = ?
-      SQL
-      res = db.fetch(sql, host_name, service_name)
-      fail "Could not find #{service_name} for host #{host_name}" unless res
-      res.first[:id]
-    end
-
     def self.sql_for_time_limit(limit)
       return '' unless limit
 
@@ -28,11 +15,11 @@ module IngraphRB
       end
     end
 
-    attr_reader :plot_id, :host_name, :service_name
+    attr_reader :plot_ids, :host_name, :service_name
 
-    def initialize(db, host_name, service_name, opts = {})
+    def initialize(db, hosts, service_name, opts = {})
       @db = db
-      @host_name = host_name
+      @hosts = normalize_hosts(hosts)
       @service_name = service_name
       @timezone = opts[:timezone]
       @limit = opts[:limit]
@@ -40,7 +27,7 @@ module IngraphRB
       @timeframe = opts[:timeframe] || Timeframe.smallest
       @x = opts[:x_key] || :x
       @y = opts[:y_key] || :y
-      @plot_id = self.class.plot_id(db, host_name, service_name)
+      find_plot_ids
     end
 
     def limit_to(span)
@@ -56,8 +43,9 @@ module IngraphRB
     def sql
       sql = ''
       sql << "SET TIME ZONE '#{@timezone}'; " if @timezone
-      sql << "SELECT (timestamp + #{@offset}) as time, timestamp, min as value "
-      sql << "FROM datapoint WHERE plot_id = #{@plot_id} "
+      sql << "SELECT plot_id, (timestamp + #{@offset}) as time, "
+      sql << 'timestamp, min as value '
+      sql << "FROM datapoint WHERE plot_id in ? "
       sql << self.class.sql_for_time_limit(@limit)
       sql << "AND timeframe_id = #{@timeframe.id} "
       sql << ' ORDER BY timestamp ASC'
@@ -65,7 +53,40 @@ module IngraphRB
     end
 
     def fetch
-      @db.fetch(sql).all
+      @db.fetch(sql, @plot_host.keys).all.map do |row|
+        row[:host_name] = @plot_host[row[:plot_id]]
+        row
+      end
+    end
+
+    private
+
+    def normalize_hosts(hosts)
+      if hosts.is_a? Array
+        if hosts.all? { |h| h.is_a? Host }
+          hosts
+        else
+          hosts.map { |h| Host.matching(@db, h) }.flatten
+        end
+      else
+        Host.matching(@db, hosts)
+      end
+    end
+
+    def find_plot_ids
+      sql = <<-SQL
+        select plot.id as id, host.name as host_name from plot
+        inner join hostservice on plot.hostservice_id = hostservice.id
+        inner join service on hostservice.service_id = service.id
+        inner join host on hostservice.host_id = host.id
+        where service.name = ? and host.id in ?
+      SQL
+      res = @db.fetch(sql, @service_name, @hosts.map { |h| h.id })
+      @plot_host = {}
+      res.each do |row|
+        @plot_host[row[:id]] = row[:host_name]
+      end
+      puts @plot_host.inspect
     end
   end
 end
