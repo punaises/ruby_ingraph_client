@@ -11,7 +11,6 @@ module IngraphRB
         inner join service on hostservice.service_id = service.id
         where host.name = ? and service.name = ?
       SQL
-      puts sql
       res = db.fetch(sql, host_name, service_name)
       fail "Could not find #{service_name} for host #{host_name}" unless res
       res.first[:id]
@@ -35,9 +34,10 @@ module IngraphRB
       @db = db
       @host_name = host_name
       @service_name = service_name
-      @timeone = opts[:timezone]
+      @timezone = opts[:timezone]
       @limit = opts[:limit]
       @offset = opts[:offset] || 0
+      @timeframe = opts[:timeframe] || Timeframe.smallest
       @x = opts[:x_key] || :x
       @y = opts[:y_key] || :y
       @plot_id = self.class.plot_id(db, host_name, service_name)
@@ -48,23 +48,24 @@ module IngraphRB
       self
     end
 
+    def with_timeframe(timeframe)
+      @timeframe = timeframe
+      self
+    end
+
     def sql
       sql = ''
       sql << "SET TIME ZONE '#{@timezone}'; " if @timezone
       sql << "SELECT (timestamp + #{@offset}) as time, timestamp, min as value "
       sql << "FROM datapoint WHERE plot_id = #{@plot_id} "
       sql << self.class.sql_for_time_limit(@limit)
+      sql << "AND timeframe_id = #{@timeframe.id} "
       sql << ' ORDER BY timestamp ASC'
       sql
     end
 
     def to_timeseries
-      rows = @db.fetch(sql).all
-      if block_given?
-        yield rows
-      else
-        rows
-      end
+      @db.fetch(sql).all
     end
   end
 end

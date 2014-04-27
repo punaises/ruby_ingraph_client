@@ -12,7 +12,7 @@ module IngraphRB
       end
 
       @smallest_interval = @timeframes.reduce(nil) do |a, e|
-        [a, e.interval].compact.min
+        [a, e[1].interval].compact.min
       end
     end
 
