@@ -8,7 +8,7 @@ module IngraphRB
     module_function
 
     def connect(opts = {})
-      Sequel.connect(connection_string(opts), opts[:db_opts])
+      Sequel.connect(connection_string(opts), opts[:db_opts] || {})
     end
 
     def connection_string(opts = {})
