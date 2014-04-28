@@ -1,0 +1,16 @@
+#!/bin/bash
+
+cd "$(dirname "$0")"
+
+echo "Note: You may see a bunch of 'aready exists' errors - these are OK"
+echo "Creating icinga user"
+createuser icinga -d
+echo "Creating ingraph-development database"
+createdb -O postgres ingraph-development
+echo "creating schema"
+psql -U postgres -d ingraph-development -f ../sql/ingraph_schema.sql
+
+echo "Creating ingraph-test database"
+createdb -O postgres ingraph-test
+echo "creating schema"
+psql -U postgres -d ingraph-test -f ../sql/ingraph_schema.sql

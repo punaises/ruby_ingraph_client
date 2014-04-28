@@ -1,0 +1,13 @@
+#!/bin/bash
+
+echo "CAUTION: This will drop the 'ingraph-development' and 'ingraph-test' databases"
+read -r -p "Do you wish to proceed? [Y/n] " response
+case $response in
+    [Yy])
+        psql -U postgres -c "DROP DATABASE \"ingraph-development\""
+        psql -U postgres -c "DROP DATABASE \"ingraph-test\""
+        ;;
+    *)
+        echo "Cancelled"
+        ;;
+esac
