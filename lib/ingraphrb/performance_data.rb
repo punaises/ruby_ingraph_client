@@ -91,7 +91,6 @@ module IngraphRB
       res.each do |row|
         @plot_host[row[:id]] = row[:host_name]
       end
-      puts @plot_host.inspect
     end
   end
 end
