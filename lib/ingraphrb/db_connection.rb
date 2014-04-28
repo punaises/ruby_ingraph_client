@@ -8,10 +8,20 @@ module IngraphRB
     module_function
 
     def connect(opts = {})
-      Sequel.connect(connection_string(opts), opts[:db_opts] || {})
+      Sequel.connect(connection_string(opts), db_opts(opts))
+    end
+
+    private
+
+    module_function
+
+    def db_opts(opts = {})
+      return {} if opts.is_a? String
+      opts[:db_opts]
     end
 
     def connection_string(opts = {})
+      return opts if opts.is_a? String
       return opts[:connection_string] if opts[:connection_string]
 
       adapter = opts[:adapter] || 'postgres'

@@ -14,11 +14,6 @@ module IngraphRB
       end
     end
 
-    def self.find(db, name)
-      new(db.fetch('select * from host where name like ?',
-                   sanitize_pattern(pattern)).first)
-    end
-
     attr_reader :id, :name
 
     def initialize(row)
