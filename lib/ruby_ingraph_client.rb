@@ -1,9 +1,9 @@
 # encoding: utf-8
 
 # main namespace module
-module IngraphRB
-  autoload :DBConnection, 'ingraphrb/db_connection'
-  autoload :Timeframe, 'ingraphrb/timeframe'
-  autoload :PerformanceData, 'ingraphrb/performance_data'
-  autoload :Host, 'ingraphrb/host'
+module RubyIngraphClient
+  autoload :DBConnection, 'ruby_ingraph_client/db_connection'
+  autoload :Timeframe, 'ruby_ingraph_client/timeframe'
+  autoload :PerformanceData, 'ruby_ingraph_client/performance_data'
+  autoload :Host, 'ruby_ingraph_client/host'
 end

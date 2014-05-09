@@ -2,12 +2,12 @@
 
 require 'spec_helper'
 
-describe IngraphRB::PerformanceData do
-  let(:db) { IngraphRBTest.db }
+describe RubyIngraphClient::PerformanceData do
+  let(:db) { RubyIngraphClientTest.db }
 
   describe '#with_timespan' do
     let(:perfdata) do
-      IngraphRB::PerformanceData.new(db, '', '')
+      RubyIngraphClient::PerformanceData.new(db, '', '')
     end
 
     it 'converts an array to a timestamp between the two elements' do
@@ -34,35 +34,35 @@ describe IngraphRB::PerformanceData do
 
   describe 'initialization' do
     describe 'host normalization' do
-      let(:perfdata) { IngraphRB::PerformanceData.new(db, @hosts, '') }
+      let(:perfdata) { RubyIngraphClient::PerformanceData.new(db, @hosts, '') }
 
       it 'takes an array of host objects as-is' do
-        @hosts = [IngraphRB::Host.new(id: 1, name: 'test1')]
+        @hosts = [RubyIngraphClient::Host.new(id: 1, name: 'test1')]
         expect(perfdata.hosts).to eq(@hosts)
       end
 
       it 'takes a single host object and returns it as an array' do
-        @hosts = IngraphRB::Host.new(id: 1, name: 'test1')
+        @hosts = RubyIngraphClient::Host.new(id: 1, name: 'test1')
         expect(perfdata.hosts).to eq([@hosts])
       end
 
       it 'takes an array of strings and finds all hosts matching those' do
         @hosts = ['server1', 'server2']
-        expected = @hosts.map { |h| IngraphRB::Host.find(db, h) }
+        expected = @hosts.map { |h| RubyIngraphClient::Host.find(db, h) }
         expect(perfdata.hosts).to match_array(expected)
       end
 
       it 'takes a single string and finds all hosts matching it' do
         @hosts = 'server%'
         expected = %w[server1 server2 server3].map do |h|
-          IngraphRB::Host.find(db, h)
+          RubyIngraphClient::Host.find(db, h)
         end
         expect(perfdata.hosts).to match_array(expected)
       end
     end
 
     it 'uses the smallest timeframe available by default' do
-      perfdata = IngraphRB::PerformanceData.new(db, '', '')
+      perfdata = RubyIngraphClient::PerformanceData.new(db, '', '')
       expect(perfdata.timeframe.interval).to eq(300)
     end
 

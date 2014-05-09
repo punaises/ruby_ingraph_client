@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-module IngraphRB
+module RubyIngraphClient
   # Wrapper to find hosts
   class Host
     def self.sanitize_pattern(pattern)

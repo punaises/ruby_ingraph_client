@@ -2,7 +2,7 @@
 
 require 'sequel'
 
-module IngraphRB
+module RubyIngraphClient
   # database connection helper
   module DBConnection
     module_function

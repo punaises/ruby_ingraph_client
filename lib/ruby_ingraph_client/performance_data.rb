@@ -3,7 +3,7 @@
 require 'timespan'
 I18n.enforce_available_locales = false
 
-module IngraphRB
+module RubyIngraphClient
   # interface to fetch performance data
   class PerformanceData
     attr_reader :plot_ids, :hosts, :service_name, :timespan

@@ -2,18 +2,18 @@
 
 require 'spec_helper'
 
-describe IngraphRB::Host do
-  let(:db) { IngraphRBTest.db }
+describe RubyIngraphClient::Host do
+  let(:db) { RubyIngraphClientTest.db }
 
   describe '.sanitize_pattern' do
     it 'replaces asterisks with percent signs' do
-      expect(IngraphRB::Host.sanitize_pattern('asdf*foo*'))
+      expect(RubyIngraphClient::Host.sanitize_pattern('asdf*foo*'))
         .to eq('asdf%foo%')
     end
   end
 
   describe '.matching' do
-    subject { IngraphRB::Host.matching(db, pattern) }
+    subject { RubyIngraphClient::Host.matching(db, pattern) }
 
     context 'when using a pattern' do
       let(:pattern) { 'server%' }

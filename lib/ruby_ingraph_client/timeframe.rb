@@ -2,7 +2,7 @@
 
 require 'sequel'
 
-module IngraphRB
+module RubyIngraphClient
   # represents a timeframe for keeping data in the database
   class Timeframe
     def self.ensure_populated(db)

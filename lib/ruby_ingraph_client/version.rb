@@ -1,5 +1,5 @@
 # encoding: utf-8
 
-module IngraphRB
+module RubyIngraphClient
   VERSION = '0.1.0'
 end
