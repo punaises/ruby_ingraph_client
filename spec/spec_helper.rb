@@ -7,40 +7,40 @@ require 'simplecov'
 SimpleCov.start
 
 $LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
-require 'ingraphrb'
+require 'ruby_ingraph_client'
 
 $LOAD_PATH.unshift(File.expand_path('../support', __FILE__))
-require 'ingraphrb_seed'
+require 'ruby_ingraph_client_seed'
 
 # test support code
-module IngraphRBTest
+module RubyIngraphClientTest
   module_function
 
   def db
-    @db ||= IngraphRB::DBConnection
+    @db ||= RubyIngraphClient::DBConnection
       .connect('postgres://postgres@localhost/ingraph-test')
   end
 end
 
 RSpec.configure do |config|
   config.before(:suite) do
-    DatabaseCleaner[:sequel, connection: IngraphRBTest.db]
+    DatabaseCleaner[:sequel, connection: RubyIngraphClientTest.db]
       .strategy = :transaction
-    DatabaseCleaner[:sequel, connection: IngraphRBTest.db]
+    DatabaseCleaner[:sequel, connection: RubyIngraphClientTest.db]
      .clean_with(:truncation)
-    DatabaseCleaner[:sequel, connection: IngraphRBTest.db].start
-    IngraphRBSeed.new(IngraphRBTest.db).seed!
+    DatabaseCleaner[:sequel, connection: RubyIngraphClientTest.db].start
+    RubyIngraphClientSeed.new(RubyIngraphClientTest.db).seed!
   end
 
   config.before(:each) do
-    DatabaseCleaner[:sequel, connection: IngraphRBTest.db].start
+    DatabaseCleaner[:sequel, connection: RubyIngraphClientTest.db].start
   end
 
   config.after(:each) do
-    DatabaseCleaner[:sequel, connection: IngraphRBTest.db].clean
+    DatabaseCleaner[:sequel, connection: RubyIngraphClientTest.db].clean
   end
 
   config.after(:suite) do
-    DatabaseCleaner[:sequel, connection: IngraphRBTest.db].clean
+    DatabaseCleaner[:sequel, connection: RubyIngraphClientTest.db].clean
   end
 end

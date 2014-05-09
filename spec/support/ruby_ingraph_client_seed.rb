@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 # seed data for tests
-class IngraphRBSeed
+class RubyIngraphClientSeed
   def initialize(db)
     @db = db
   end

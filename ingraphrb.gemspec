@@ -1,15 +1,15 @@
 # encoding: utf-8
 
 $LOAD_PATH << File.expand_path("../lib", __FILE__)
-require 'ingraphrb/version'
+require 'ruby_ingraph_client/version'
 
 Gem::Specification.new do |gem|
-  gem.name        = 'ingraphrb'
-  gem.version     = IngraphRB::VERSION
+  gem.name        = 'ruby_ingraph_client'
+  gem.version     = RubyIngraphClient::VERSION
   gem.platform    = Gem::Platform::RUBY
   gem.authors     = 'Simplifi Development Team'
   gem.email       = 'dev@simpli.fi'
-  gem.homepage    = 'http://github.com/simplifi/ingraphrb'
+  gem.homepage    = 'http://github.com/simplifi/ruby_ingraph_client'
   gem.summary     = %q{Ingraph Ruby gem}
   gem.description = %q{Ruby gem for accessing Ingraph (Icinga) performance data}
 
