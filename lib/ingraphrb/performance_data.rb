@@ -1,15 +1,18 @@
 # encoding: utf-8
 
 require 'timespan'
+I18n.enforce_available_locales = false
 
 module IngraphRB
   # interface to fetch performance data
   class PerformanceData
-    attr_reader :plot_ids, :host_name, :service_name
+    attr_reader :plot_ids, :hosts, :service_name, :timespan
+    attr_reader :timeframe
 
     def initialize(db, hosts, service_name, opts = {})
+      Timeframe.ensure_populated(db)
       @db = db
-      @hosts = normalize_hosts(hosts)
+      @hosts = normalize_hosts([hosts].flatten)
       @service_name = service_name
       @timezone = opts[:timezone]
       @timespan = opts[:timespan]
@@ -54,6 +57,8 @@ module IngraphRB
     def normalize_timespan(timespan_in)
       if timespan_in.is_a? Array
         Timespan.new(0).from(timespan_in[0]).until(timespan_in[1])
+      elsif timespan_in.is_a? Timespan
+        timespan_in
       else
         Timespan.new(timespan_in)
       end

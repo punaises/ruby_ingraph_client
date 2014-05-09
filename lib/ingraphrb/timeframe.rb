@@ -5,6 +5,10 @@ require 'sequel'
 module IngraphRB
   # represents a timeframe for keeping data in the database
   class Timeframe
+    def self.ensure_populated(db)
+      populate(db) unless @timeframes
+    end
+
     def self.populate(db)
       @timeframes = {}
       db.fetch('select * from timeframe').map do |row|

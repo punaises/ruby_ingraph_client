@@ -14,11 +14,19 @@ module IngraphRB
       end
     end
 
+    def self.find(db, name)
+      new(db.fetch('select * from host where name = ?', name).first)
+    end
+
     attr_reader :id, :name
 
     def initialize(row)
       @id = row[:id]
       @name = row[:name]
+    end
+
+    def ==(other)
+      @id == other.id && @name == other.name
     end
   end
 end
