@@ -9,18 +9,18 @@ module RubyIngraphClient
     attr_reader :plot_ids, :hosts, :service_name, :timespan
     attr_reader :timeframe
 
-    def initialize(db, hosts, service_name, opts = {})
+    def initialize(db, hosts, service_name)
       Timeframe.ensure_populated(db)
       @db = db
       @hosts = normalize_hosts([hosts].flatten)
       @service_name = service_name
-      @timezone = opts[:timezone]
-      @timespan = opts[:timespan]
-      @offset = opts[:offset] || 0
-      @timeframe = opts[:timeframe] || Timeframe.smallest
-      @x = opts[:x_key] || :x
-      @y = opts[:y_key] || :y
+      @timeframe = Timeframe.smallest
       find_plot_ids
+    end
+
+    def with_timezone(tz)
+      @timzezone = tz
+      self
     end
 
     def with_timespan(timespan)
@@ -36,9 +36,8 @@ module RubyIngraphClient
     def sql
       sql = ''
       sql << "SET TIME ZONE '#{@timezone}'; " if @timezone
-      sql << "SELECT plot_id, (timestamp + #{@offset}) as time, "
-      sql << 'timestamp, min as value '
-      sql << "FROM datapoint WHERE plot_id in ? "
+      sql << 'SELECT plot_id, timestamp, min as value '
+      sql << 'FROM datapoint WHERE plot_id in ? '
       sql << sql_for_timespan
       sql << "AND timeframe_id = #{@timeframe.id} "
       sql << ' ORDER BY timestamp ASC'
