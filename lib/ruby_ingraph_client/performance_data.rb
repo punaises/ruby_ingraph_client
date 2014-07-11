@@ -7,14 +7,15 @@ module RubyIngraphClient
   # interface to fetch performance data
   class PerformanceData
     attr_reader :plot_ids, :hosts, :service_name, :timespan
-    attr_reader :timeframe
+    attr_reader :timeframe, :plot_name
 
-    def initialize(db, hosts, service_name)
+    def initialize(db, hosts, service_name, plot_name = '%')
       Timeframe.ensure_populated(db)
       @db = db
       @hosts = normalize_hosts([hosts].flatten)
       @service_name = service_name
       @timeframe = Timeframe.smallest
+      @plot_name = plot_name
       find_plot_ids
     end
 
@@ -34,6 +35,7 @@ module RubyIngraphClient
     end
 
     def sql
+      @timeframe ||= Timeframe.smallest
       sql = ''
       sql << "SET TIME ZONE '#{@timezone}'; " if @timezone
       sql << 'SELECT plot_id, timestamp, min as value '
@@ -88,9 +90,9 @@ module RubyIngraphClient
         inner join hostservice on plot.hostservice_id = hostservice.id
         inner join service on hostservice.service_id = service.id
         inner join host on hostservice.host_id = host.id
-        where service.name = ? and host.id in ?
+        where service.name = ? and host.id in ? and plot.name like ?
       SQL
-      res = @db.fetch(sql, @service_name, @hosts.map { |h| h.id })
+      res = @db.fetch(sql, @service_name, @hosts.map { |h| h.id }, @plot_name)
       @plot_host = {}
       res.each do |row|
         @plot_host[row[:id]] = row[:host_name]
