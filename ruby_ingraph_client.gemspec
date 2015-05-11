@@ -15,9 +15,11 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency 'pg'
   gem.add_dependency 'sequel'
+  gem.add_dependency 'activesupport', '~>4.1.0'
   gem.add_dependency 'timespan'
 
   gem.add_development_dependency 'rspec'
+  gem.add_development_dependency 'rspec-its'
   gem.add_development_dependency 'database_cleaner'
   gem.add_development_dependency 'simplecov'
 

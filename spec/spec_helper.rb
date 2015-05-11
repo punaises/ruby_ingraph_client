@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+require 'rspec/its'
 require 'sequel'
 require 'database_cleaner'
 
